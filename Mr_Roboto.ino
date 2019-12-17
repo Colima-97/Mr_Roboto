@@ -38,7 +38,7 @@ void infinite_forward(){
   
   while(true){
     digitalWrite(Trigger, HIGH);
-    delayMicroseconds(10);      //Enviamos un pulso de 10us
+    delayMicroseconds(100);      //Enviamos un pulso de 10us
     digitalWrite(Trigger, LOW);
     
     t = pulseIn(Echo, HIGH);    //obtenemos el ancho del pulso
@@ -66,21 +66,24 @@ void infinite_forward(){
 }
 
 void forward(int steps){
-  Serial.println("Avanzando");
+  Serial.print("Avanzando "); Serial.print(steps); Serial.println(" pasos");
   digitalWrite(dirpin, true);
   digitalWrite(dirpin2, 0);
-   
-  for(int x = 0; x < steps; x++){  
-    digitalWrite(steppin,HIGH);      
-    delayMicroseconds(tiempo);
-    digitalWrite(steppin,LOW);
-    delayMicroseconds(tiempo);
 
-    digitalWrite(steppin2,HIGH);      
-    delayMicroseconds(tiempo);
-    digitalWrite(steppin2,LOW);
-    delayMicroseconds(tiempo);
-  }
+  if(steps < 200){
+    for(int x = 0; x < steps; x++){  
+      digitalWrite(steppin,HIGH);      
+      delayMicroseconds(tiempo);
+      digitalWrite(steppin,LOW);
+      delayMicroseconds(tiempo);
+
+      digitalWrite(steppin2,HIGH);      
+      delayMicroseconds(tiempo);
+      digitalWrite(steppin2,LOW);
+      delayMicroseconds(tiempo);
+    }
+  }   
+  
 }
 
 void backward(int pasos){
@@ -143,19 +146,20 @@ void left(){
 int identify_color(long distance){
   Serial.println("Entré a color");
   long d = distance;
-  long rem_dist = d - 1; // Remaining distance for 1 cm  
+  long rem_dist = d - 2; // Remaining distance for 2 cm  
+  Serial.print("Faltan "); Serial.print(rem_dist); Serial.println(" cm para 2 cm");
   bool flag = true;
   int steps;
   metodo = 0;
-
-  if(d > 1){
-    steps = (rem_dist * 200)/20;
-    forward(steps);
-    Serial.print("steps restantes "); Serial.println(steps);    
-  }else if(d < 1){
+  
+  if(d < 2){
     steps = 10;
     backward(steps);    
   }else{
+    steps = (rem_dist * 200)/20; // 200 steps = 20 cm
+    forward(steps);
+    Serial.print("steps restantes "); Serial.println(steps);   
+
     Serial.print("Objeto Adelante a: ");
     Serial.println(d);
 
@@ -249,7 +253,7 @@ void loop(){
   int back = 30; // Moves 3 cm back
   
   digitalWrite(Trigger, HIGH);
-  delayMicroseconds(10);      //Enviamos un pulso de 10us
+  delayMicroseconds(100);      //Enviamos un pulso de 10us
   digitalWrite(Trigger, LOW);
   
   t = pulseIn(Echo, HIGH);    //obtenemos el ancho del pulso
