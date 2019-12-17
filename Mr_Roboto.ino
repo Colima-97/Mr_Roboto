@@ -178,8 +178,7 @@ int identify_color(long distance){
   metodo = 0;  
     
   if(d > 1 && d < 5){    
-    //steps = (rem_dist * 200)/20; // 200 steps = 20 cm
-    delay(1000);
+    delay(500);
     forward();
 
     Serial.print("Objeto Adelante a: ");
@@ -201,37 +200,7 @@ int identify_color(long distance){
           metodo = 2;
           c_blanco = 0;  
           flag = false;
-        }
-      }else if(r < 1000 && g < 1000 && b < 1000){ // Si es negro gira a la izquierda
-        if(b > r && b > g){  // Si es azul paro total
-          // Insertar código aquí
-          Serial.println("Objeto Azul");
-          Serial.print(r); Serial.print(" "); Serial.print(g); Serial.print(" "); Serial.print(b); Serial.println("");
-          if(c_azul < 5){
-            Serial.println("Contador azul ");
-            Serial.print(c_azul);
-            Serial.println(" veces");
-            c_azul++;
-          }else{
-            metodo = 4;
-            c_azul = 0; 
-            flag = false; 
-          }
-          
-        }else{
-          Serial.println("Objeto Negro");
-          Serial.print(r); Serial.print(" "); Serial.print(g); Serial.print(" "); Serial.print(b); Serial.println("");
-          if(c_negro < 5){
-            Serial.println("Contador negro ");
-            Serial.print(c_negro);
-            Serial.println(" veces");
-            c_negro++;
-          }else{
-            metodo = 1;
-            c_negro = 0;  
-            flag = false;
-          }
-        }
+        }              
       }else if(r > g && r > b){ // Si es rojo agarrar objeto con la pinza
         // Código de pinza
         Serial.println("Objeto Rojo");
@@ -240,7 +209,7 @@ int identify_color(long distance){
           Serial.println("Contador rojo ");
           Serial.print(c_rojo);
           Serial.println(" veces");
-          c_rojo++;
+          c_rojo++;          
         }else{
           metodo = 3;
           c_rojo = 0;
@@ -260,12 +229,22 @@ int identify_color(long distance){
             c_azul = 0;
             flag = false;
           }
-      }else{
-        Serial.println("Color no identificado");
+      }else{// Color negro
+        Serial.println("Objeto Negro");
         Serial.print(r); Serial.print(" "); Serial.print(g); Serial.print(" "); Serial.print(b); Serial.println("");
-      }
-    }
-  }      
+        if(c_negro < 5){
+          Serial.println("Contador negro ");
+          Serial.print(c_negro);
+          Serial.println(" veces");
+          c_negro++;
+        }else{
+          metodo = 1;
+          c_negro = 0;  
+          flag = false;
+        } // End of "counter black" else        
+      } // End of "black" else
+    } // End of while loop
+  } // End of if cycle   
   return metodo;
 }
 
