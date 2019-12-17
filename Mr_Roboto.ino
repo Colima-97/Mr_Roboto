@@ -59,6 +59,8 @@ void infinite_forward(){
       delayMicroseconds(tiempo);
       digitalWrite(steppin2,LOW);
       delayMicroseconds(tiempo);
+    }else{
+      break;
     }
   }
 }
@@ -250,12 +252,13 @@ void loop(){
   
   Serial.print("Distancia "); Serial.println(d);  
   
-  infinite_forward();
-
-  if(d < 5){  
-    int metodo = identify_color(d);
-    delay(500);
+  if(d < 4){
+    infinite_forward();
   }
+  
+  int metodo = identify_color(d);
+  delay(1000);
+  
 
   switch(metodo){
     case 1:
