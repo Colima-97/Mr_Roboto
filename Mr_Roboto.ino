@@ -144,18 +144,18 @@ int identify_color(long distance){
   Serial.println("Entré a color");
   long d = distance;
   long rem_dist = d - 1; // Remaining distance for 1 cm  
-  bool bandera = true;
-  int pasos;
+  bool flag = true;
+  int steps;
 
-  if(rem_dist != 0){    
-    pasos = (rem_dist * 200)/20;
-    forward(pasos);
-    Serial.print("Pasos restantes "); Serial.println(pasos);
+  if(d != 1){    
+    steps = (rem_dist * 200)/20;
+    forward(steps);
+    Serial.print("steps restantes "); Serial.println(steps);
   }else{
     Serial.print("Objeto Adelante a: ");
     Serial.println(d);
 
-    while(bandera){  
+    while(flag){  
       uint16_t r, g, b, c, colorTemp, lux; 
       tcs.getRawData(&r, &g, &b, &c);
       
@@ -170,7 +170,7 @@ int identify_color(long distance){
         }else{
           metodo = 2;
           c_blanco = 0;  
-          bandera = false;
+          flag = false;
         }
       }else if(r < 1000 && g < 1000 && b < 1000){ // Si es negro gira a la izquierda
         if(b > r && b > g){  // Si es azul paro total
@@ -185,7 +185,7 @@ int identify_color(long distance){
           }else{
             metodo = 4;
             c_azul = 0; 
-            bandera = false; 
+            flag = false; 
           }
           
         }else{
@@ -199,7 +199,7 @@ int identify_color(long distance){
           }else{
             metodo = 1;
             c_negro = 0;  
-            bandera = false;
+            flag = false;
           }
         }
       }else if(r > g && r > b){ // Si es rojo agarrar objeto con la pinza
@@ -214,7 +214,7 @@ int identify_color(long distance){
         }else{
           metodo = 3;
           c_rojo = 0;
-          bandera = false; 
+          flag = false; 
         }      
       }else if(b > r && b > g){  // Si es azul paro total
           // Insertar código aquí
@@ -228,7 +228,7 @@ int identify_color(long distance){
           }else{      
             metodo = 4;  
             c_azul = 0;
-            bandera = false;
+            flag = false;
           }
       }else{
         Serial.println("Color no identificado");
