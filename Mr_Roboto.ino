@@ -83,12 +83,12 @@ void forward(int steps){
   }
 }
 
-void backward(){
+void backward(int pasos){
   Serial.println("Cambiando direccion ");
-  Serial.println("Retrocediendo ");
+  Serial.print("Retrocediendo "); Serial.print(pasos / 10); Serial.println(" cm");
   digitalWrite(dirpin, 0);
   digitalWrite(dirpin2, true);
-  for(int x = 0; x < 200; x++){  
+  for(int x = 0; x < pasos; x++){  
     digitalWrite(steppin,HIGH);    
     delayMicroseconds(tiempo);
     digitalWrite(steppin,LOW);
@@ -146,11 +146,15 @@ int identify_color(long distance){
   long rem_dist = d - 1; // Remaining distance for 1 cm  
   bool flag = true;
   int steps;
+  metodo = 0;
 
-  if(d != 1){    
+  if(d > 1){
     steps = (rem_dist * 200)/20;
     forward(steps);
-    Serial.print("steps restantes "); Serial.println(steps);
+    Serial.print("steps restantes "); Serial.println(steps);    
+  }else if(d < 1){
+    steps = 10;
+    backward(steps);    
   }else{
     Serial.print("Objeto Adelante a: ");
     Serial.println(d);
@@ -242,6 +246,7 @@ int identify_color(long distance){
 void loop(){
   long t; //timepo que demora en llegar el eco
   long d; //distancia en centimetros
+  int back = 30; // Moves 3 cm back
   
   digitalWrite(Trigger, HIGH);
   delayMicroseconds(10);      //Enviamos un pulso de 10us
@@ -252,7 +257,7 @@ void loop(){
   
   Serial.print("Distancia "); Serial.println(d);  
   
-  if(d < 4){
+  if(d > 4){
     infinite_forward();
   }
   
@@ -263,10 +268,12 @@ void loop(){
   switch(metodo){
     case 1:
       //girar izquierda
+      backward(back); // Moves 3 cm back
       left();
       break;
     case 2:
       //girar derecha
+      backward(back); // Moves 3 cm back
       right();
       break;
     case 3:
