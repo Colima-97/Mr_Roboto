@@ -30,15 +30,19 @@ void setup(){
   Serial.begin(9600);
 }
 
-void infinite_forward(){
+long infinite_forward(){
   Serial.println("Infinite ");
 
   long t; //timepo que demora en llegar el eco
   long d; //distancia en centimetros
+  digitalWrite(dirpin, true);
+  digitalWrite(dirpin2, 0); 
   
   while(true){
+    digitalWrite(Trigger, LOW);
+    delayMicroseconds(2);
     digitalWrite(Trigger, HIGH);
-    delayMicroseconds(100);      //Enviamos un pulso de 10us
+    delayMicroseconds(10);      //Enviamos un pulso de 10us
     digitalWrite(Trigger, LOW);
     
     t = pulseIn(Echo, HIGH);    //obtenemos el ancho del pulso
@@ -46,10 +50,7 @@ void infinite_forward(){
     
     Serial.print("Distancia "); Serial.println(d);
 
-    if(d > 4){
-      digitalWrite(dirpin, true);
-      digitalWrite(dirpin2, 0); 
-
+    if(d > 4){      
       digitalWrite(steppin,HIGH);      
       delayMicroseconds(tiempo);
       digitalWrite(steppin,LOW);
@@ -63,15 +64,38 @@ void infinite_forward(){
       break;
     }
   }
+  return d;
 }
 
-void forward(int steps){
-  Serial.print("Avanzando "); Serial.print(steps); Serial.println(" pasos");
+void forward(){ 
+  Serial.println("Acercándonos al objeto"); 
   digitalWrite(dirpin, true);
   digitalWrite(dirpin2, 0);
 
-  if(steps < 200){
-    for(int x = 0; x < steps; x++){  
+  long t; //timepo que demora en llegar el eco
+  long d; //distancia en centimetros 
+  int cont = 0;
+  int cont2 = 0;
+  
+  while(true){
+    digitalWrite(Trigger, LOW);
+    delayMicroseconds(2);
+    digitalWrite(Trigger, HIGH);
+    delayMicroseconds(10);      //Enviamos un pulso de 10us
+    digitalWrite(Trigger, LOW);
+    
+    t = pulseIn(Echo, HIGH);    //obtenemos el ancho del pulso
+    d = t/59;                   //escalamos el tiempo a una distancia en cm
+    
+    Serial.print("Distancia "); Serial.println(d);
+
+    if((d >= 2 || d > 1000) && cont < 5){   
+      if(d > 1000 ){
+        cont++;
+      }
+      if(cont != 0 && d < 5){
+        cont = 0;
+      }
       digitalWrite(steppin,HIGH);      
       delayMicroseconds(tiempo);
       digitalWrite(steppin,LOW);
@@ -81,14 +105,17 @@ void forward(int steps){
       delayMicroseconds(tiempo);
       digitalWrite(steppin2,LOW);
       delayMicroseconds(tiempo);
-    }
-  }   
-  
+      cont2++;     
+    }else{
+      Serial.println("\n");
+      Serial.println(cont2);
+      break;
+    }      
+  }       
 }
 
 void backward(int pasos){
   Serial.println("Cambiando direccion ");
-  Serial.print("Retrocediendo "); Serial.print(pasos / 10); Serial.println(" cm");
   digitalWrite(dirpin, 0);
   digitalWrite(dirpin2, true);
   for(int x = 0; x < pasos; x++){  
@@ -146,19 +173,14 @@ void left(){
 int identify_color(long distance){
   Serial.println("Entré a color");
   long d = distance;
-  long rem_dist = d - 2; // Remaining distance for 2 cm  
-  Serial.print("Faltan "); Serial.print(rem_dist); Serial.println(" cm para 2 cm");
-  bool flag = true;
-  int steps;
-  metodo = 0;
-  
-  if(d < 2){
-    steps = 10;
-    backward(steps);    
-  }else{
-    steps = (rem_dist * 200)/20; // 200 steps = 20 cm
-    forward(steps);
-    Serial.print("steps restantes "); Serial.println(steps);   
+  Serial.print("Distancia "); Serial.println(d);  
+  bool flag = true;  
+  metodo = 0;  
+    
+  if(d > 1 && d < 5){    
+    //steps = (rem_dist * 200)/20; // 200 steps = 20 cm
+    delay(1000);
+    forward();
 
     Serial.print("Objeto Adelante a: ");
     Serial.println(d);
@@ -170,7 +192,7 @@ int identify_color(long distance){
       if(r > 1000 && g > 1000 && b > 1000){ // Si es blanco gira a la derecha
         Serial.println("Objeto Blanco");
         Serial.print(r); Serial.print(" "); Serial.print(g); Serial.print(" "); Serial.print(b); Serial.println("");
-        if(c_blanco < 3){
+        if(c_blanco < 5){
           Serial.print("Contador blanco ");
           Serial.print(c_blanco);
           Serial.println(" veces");
@@ -185,7 +207,7 @@ int identify_color(long distance){
           // Insertar código aquí
           Serial.println("Objeto Azul");
           Serial.print(r); Serial.print(" "); Serial.print(g); Serial.print(" "); Serial.print(b); Serial.println("");
-          if(c_azul < 3){
+          if(c_azul < 5){
             Serial.println("Contador azul ");
             Serial.print(c_azul);
             Serial.println(" veces");
@@ -199,7 +221,7 @@ int identify_color(long distance){
         }else{
           Serial.println("Objeto Negro");
           Serial.print(r); Serial.print(" "); Serial.print(g); Serial.print(" "); Serial.print(b); Serial.println("");
-          if(c_negro < 3){
+          if(c_negro < 5){
             Serial.println("Contador negro ");
             Serial.print(c_negro);
             Serial.println(" veces");
@@ -214,7 +236,7 @@ int identify_color(long distance){
         // Código de pinza
         Serial.println("Objeto Rojo");
         Serial.print(r); Serial.print(" "); Serial.print(g); Serial.print(" "); Serial.print(b); Serial.println("");
-        if(c_rojo < 3){
+        if(c_rojo < 5){
           Serial.println("Contador rojo ");
           Serial.print(c_rojo);
           Serial.println(" veces");
@@ -228,7 +250,7 @@ int identify_color(long distance){
           // Insertar código aquí
           Serial.println("Objeto Azul");
           Serial.print(r); Serial.print(" "); Serial.print(g); Serial.print(" "); Serial.print(b); Serial.println("");
-          if(c_azul < 3){
+          if(c_azul < 5){
             Serial.println("Contador azul ");
             Serial.print(c_azul);
             Serial.println(" veces");
@@ -243,41 +265,43 @@ int identify_color(long distance){
         Serial.print(r); Serial.print(" "); Serial.print(g); Serial.print(" "); Serial.print(b); Serial.println("");
       }
     }
-  }
+  }      
   return metodo;
 }
 
 void loop(){
   long t; //timepo que demora en llegar el eco
   long d; //distancia en centimetros
-  int back = 30; // Moves 3 cm back
+  int back = 70; // Moves 5 cm back
+  long distance = 0;
   
+  digitalWrite(Trigger, LOW);
+  delayMicroseconds(2);
   digitalWrite(Trigger, HIGH);
-  delayMicroseconds(100);      //Enviamos un pulso de 10us
+  delayMicroseconds(10);      //Enviamos un pulso de 10us
   digitalWrite(Trigger, LOW);
   
   t = pulseIn(Echo, HIGH);    //obtenemos el ancho del pulso
-  d = t/59;                   //escalamos el tiempo a una distancia en cm
-  
-  Serial.print("Distancia "); Serial.println(d);  
+  d = t/59;                   //escalamos el tiempo a una distancia en cm 
   
   if(d > 4){
-    infinite_forward();
+    distance = infinite_forward();
   }
-  
-  int metodo = identify_color(d);
+  if(distance == 0){
+    distance = d;    
+  }
+  int metodo = identify_color(distance);
   delay(1000);
   
-
   switch(metodo){
     case 1:
       //girar izquierda
-      backward(back); // Moves 3 cm back
+      backward(back);
       left();
       break;
     case 2:
       //girar derecha
-      backward(back); // Moves 3 cm back
+      backward(back);
       right();
       break;
     case 3:
