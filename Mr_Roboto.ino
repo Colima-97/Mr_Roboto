@@ -201,7 +201,22 @@ int identify_color(long distance){
           c_blanco = 0;  
           flag = false;
         }              
-      }else if(r > g && r > b){ // Si es rojo agarrar objeto con la pinza
+      }else if(r < 500 && r < 500 && b < 500){// Color negro
+        Serial.println("Objeto Negro");
+        Serial.print(r); Serial.print(" "); Serial.print(g); Serial.print(" "); Serial.print(b); Serial.println("");
+        if(c_negro < 5){
+          Serial.println("Contador negro ");
+          Serial.print(c_negro);
+          Serial.println(" veces");
+          c_negro++;
+        }else{
+          metodo = 1;
+          c_negro = 0;  
+          flag = false;
+        } // End of "counter black" else        
+      } // End of "black" else
+      
+      else if(r > g && r > b){ // Si es rojo agarrar objeto con la pinza
         // Código de pinza
         Serial.println("Objeto Rojo");
         Serial.print(r); Serial.print(" "); Serial.print(g); Serial.print(" "); Serial.print(b); Serial.println("");
@@ -229,20 +244,7 @@ int identify_color(long distance){
             c_azul = 0;
             flag = false;
           }
-      }else{// Color negro
-        Serial.println("Objeto Negro");
-        Serial.print(r); Serial.print(" "); Serial.print(g); Serial.print(" "); Serial.print(b); Serial.println("");
-        if(c_negro < 5){
-          Serial.println("Contador negro ");
-          Serial.print(c_negro);
-          Serial.println(" veces");
-          c_negro++;
-        }else{
-          metodo = 1;
-          c_negro = 0;  
-          flag = false;
-        } // End of "counter black" else        
-      } // End of "black" else
+      }
     } // End of while loop
   } // End of if cycle   
   return metodo;
